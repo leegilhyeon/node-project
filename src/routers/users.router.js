@@ -21,6 +21,7 @@ router.post('/sign-up', async (req, res) => {
     const userInfo = await prisma.userInfos.create({
         data: {
             userId: user.userId,
+            email,
             name,
             role,
         }
