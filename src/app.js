@@ -1,6 +1,7 @@
 import express from 'express';
 import UsersRouter from './routers/auth.router.js';
 import UserRouter from './routers/users.router.js';
+import ResumeRouter from './routers/resumes.router.js';
 import 'dotenv/config';
 // import errorHandler from './middlewares/error-handler.middleware.js';
 import cookieParser from 'cookie-parser';
@@ -14,7 +15,7 @@ const port = process.env.SERVER_PORT;
 app.use(express.json());
 // app.use(errorHandler());
 app.use(cookieParser());
-app.use('/api', [UsersRouter,UserRouter]);
+app.use('/api', [UsersRouter,UserRouter,ResumeRouter]);
 
 app.get('/', (req, res) => {
     return res.json('hello');

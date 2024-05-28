@@ -5,7 +5,7 @@ import 'dotenv/config';
 export default async function (req, res, next) {
     //
     try{ 
-        const authorization = req.headers['authorization'];
+        const authorization = req.headers.authorization
     
     if(!authorization) {
         return res.status(401).json({errorMessage: '인증정보가 없습니다.'})
