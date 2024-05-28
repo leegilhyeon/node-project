@@ -9,7 +9,7 @@ const router = express.Router();
 // const REFRESH_TOKEN_SECRET_KEY = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 //회원가입
-router.post('/sign-up', async (req, res) => {
+router.post('/sign-up', async (req, res, next) => {
     const {email, password,passwordCheck, name} =req.body
     const isExistUser = await prisma.users.findFirst({
         where: {
@@ -17,8 +17,17 @@ router.post('/sign-up', async (req, res) => {
         },
     });
     if (isExistUser) {
-        return res.status(409).json({message: '이미 존재하는 이메일입니다.'})
+        return res.status(409).json({message: '이미 존재하는 사용자입니다.'})
     }
+    if (!email) {
+        return res.status(400).json({message:'이메일을 입력해주세요.'})
+        }
+    if (!name) {
+            return res.status(400).json({message:'이름을 입력해주세요.'})
+            }    
+    if (!password) {
+            return res.status(400).json({message:'비밀번호를 입력해주세요.'})
+            }
     if (password !== passwordCheck) {
     return res.status(400).json({message:'비밀번호가 일치하지 않습니다.'})
     }
@@ -50,7 +59,8 @@ router.post('/sign-up', async (req, res) => {
 //     - **AccessToken**을 반환합니다.
 // 로그인
 router.post('/sign-in', async(req, res) => {
-    const { email, password } = req.body;
+    try{
+        const { email, password } = req.body;
     //전달받은 email을 가진 사용자가 있는 지 확인
     const user = await prisma.users.findFirst({where:{email}});
     if(!user) {
@@ -75,15 +85,13 @@ router.post('/sign-in', async(req, res) => {
                 }
             } 
         }
-    }) 
-    
-    //클라이언트에게 토큰할당
-    // res.cookie('accessToken', accessToken);
-    // res.cookie('refreshToken', refreshToken);
-    // res.header('Authorization', `Bearer${accessToken}`);
+    })
     return res.status(200).json({accessToken,refreshToken});
- 
-})
+    } catch (error) {
+        next(error);
+    }
+    
+});
 
 
 
