@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { prisma } from '../utils/prisma.util'; 
 
 export default async function (req, res) {
    try{
@@ -11,6 +12,18 @@ export default async function (req, res) {
     //발급한 jwt 검증
     const decodedToken = jwt.verify(token, 'secret_key'); //시크릿 키가 일치하다면 decodedToken에 정보전달해준다
     const userId = decodedToken.userId;
+
+    //jwt 의 userId 이용하여 사용자 조회
+    const user = await prisma.users.findFirst({
+        where: {userId: +userId},
+    })
+    if (!user) {
+        res.clearCookie('authorization');
+        throw new Error('토큰 사용자가 존재하지 않습니다.');
+    }
+    req.user = user; //req.user에 조회된 사용자 정보 할당
+
+    next();
 
    } catch( error ) {
      res.clearCookie('authorization'); // 인증에 실패한 특정 쿠키 삭제

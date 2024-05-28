@@ -14,27 +14,27 @@ datasource db {
 }
 
 model Users {
-  userId        Int      @id @default(autoincrement()) @map("userId")
-  email         String   @unique @map("email")
-  password      String   @map("password")
-  createdAt     DateTime @default(now()) @map("createdAt") 
-  updatedAt     DateTime @updatedAt @map("updatedAt")
+  userId        Int              @id @default(autoincrement()) @map("userId")
+  email         String           @unique @map("email")
+  password      String           @map("password")
+  createdAt     DateTime         @default(now()) @map("createdAt") 
+  updatedAt     DateTime         @updatedAt @map("updatedAt")
 
-  UserInfos UserInfos? //1:1 관계에서 유저정보가 있을수도 있고 없을 수도 있음
-  Resume Resume?
+  UserInfos     UserInfos?       // 1:1 관계에서 유저정보가 있을수도 있고 없을 수도 있음
+  Resumes       Resume?
+  RefreshTokens RefreshToken[]
 
   @@map("Users")
 }
 
 model UserInfos {
-  
-  UserId       Int      @unique @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  UserId       Int      @id @unique @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
   name         String   @map("name")
-  role         Role     @default(APPLICANT)@map("role")
+  role         Role     @default(APPLICANT) @map("role")
   createdAt    DateTime @default(now()) @map("createdAt")
   updatedAt    DateTime @updatedAt @map("updatedAt")
 
-  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  User         Users    @relation(fields: [UserId], references: [userId], onDelete: Cascade)
 
   @@map("UserInfos")
 }
@@ -53,7 +53,7 @@ model Resume {
   createdAt    DateTime @default(now()) @map("createdAt")
   updatedAt    DateTime @updatedAt @map("updatedAt")
 
-  user Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  user         Users    @relation(fields: [UserId], references: [userId], onDelete: Cascade)
 
   @@map("Resume") 
 }
@@ -67,3 +67,13 @@ enum Status {
   FINAL_PASS
 }
 
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @map("token")
+  UserId    Int      @map("userId")
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  user      Users    @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  @@map("RefreshToken")
+}
